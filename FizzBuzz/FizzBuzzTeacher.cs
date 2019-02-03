@@ -4,7 +4,7 @@
 // in any binaries, libraries, repositories, and source code (directly or derived) from
 // our binaries, libraries, projects, or solutions.
 // 
-// This source code contained in "FizzBuzzAnswers.cs" belongs to Protiguous@Protiguous.com and
+// This source code contained in "FizzBuzzTeacher.cs" belongs to Protiguous@Protiguous.com and
 // Rick@AIBrain.org unless otherwise specified or the original license has
 // been overwritten by formatting.
 // (We try to avoid it from happening, but it does accidentally happen.)
@@ -37,7 +37,8 @@
 // Our GitHub address is "https://github.com/Protiguous".
 // Feel free to browse any source code we *might* make available.
 // 
-// Project: "FizzBuzz", "FizzBuzzAnswers.cs" was last formatted by Protiguous on 2019/02/02 at 8:16 PM.
+// Project: "FizzBuzz", "FizzBuzzTeacher.cs" was last formatted by Protiguous on 2019/02/03 at 3:14 AM.
+
 namespace FizzBuzz {
 
     using System;
@@ -55,27 +56,10 @@ namespace FizzBuzz {
         [NotNull]
         public IList<String> RealAnswers { get; } = new List<String>();
 
-        [NotNull]
-        public async Task Populate() {
-            try {
-                var filename = Path.Combine( Path.GetTempPath(), nameof( FizzBuzzTeacher ) + ".txt" );
-
-                if ( !File.Exists( filename ) ) {
-                    var webclient = new WebClient();
-
-                    await webclient.DownloadFileTaskAsync( @"https://raw.githubusercontent.com/Keith-S-Thompson/fizzbuzz-polyglot/master/expected-output.txt", filename )
-                        .ConfigureAwait( false );
-                }
-
-                var content = await File.ReadAllLinesAsync( filename ).ConfigureAwait( false );
-
-                this.RealAnswers.Clear();
-                ( this.RealAnswers as List<String> )?.AddRange( content );
-            }
-            catch ( Exception exception) {
-                exception.Report();
-                await Task.FromException( exception ).ConfigureAwait( false );
-            }
+        /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
+        public void Dispose() {
+            this.Dispose( true );
+            GC.SuppressFinalize( this );
         }
 
         public void Grade( [NotNull] IFizzBuzzTest test ) {
@@ -94,11 +78,11 @@ namespace FizzBuzz {
 
                 var areSame = this.RealAnswers.SequenceEqual( test.MyAnswers, StringComparer.OrdinalIgnoreCase );
 
-                var result = $"The {test.NumbersToCount} answers appear to be {(areSame ? "correct" : "wrong")}.";
-
-                Console.WriteLine( result );
+                var result = $"The {test.NumbersToCount} answers appear to be {( areSame ? "correct" : "wrong" )}.";
 
                 if ( !areSame ) {
+                    Console.WriteLine( result );
+
                     for ( var i = test.StartingNumber; i < test.EndingNumber; i++ ) {
                         var me = test.MyAnswers[ i ];
                         var them = this.RealAnswers[ i ];
@@ -108,11 +92,82 @@ namespace FizzBuzz {
                             Debugger.Break();
                         }
                     }
+
                     Assert.Fail( result );
                 }
             }
-            finally{
+            finally {
                 Assert.Pass( "Test Done." );
+            }
+        }
+
+        [NotNull]
+        public async Task LoadExpectedOutputs() {
+            if ( !this.RealAnswers.Any() ) {
+                await LoadFromLocalFile().ConfigureAwait( false );
+            }
+
+            if ( !this.RealAnswers.Any() ) {
+                await LoadFromGithub().ConfigureAwait( false );
+            }
+
+            async Task LoadFromLocalFile() {
+                try {
+                    var localFile = new FileInfo( "ExpectedOutput.1-100.txt" );
+
+                    if ( localFile.Exists ) {
+                        Console.Write( "Loading local file..." );
+                        var content = await File.ReadAllLinesAsync( localFile.FullName ).ConfigureAwait( false );
+
+                        this.RealAnswers.Clear();
+                        ( this.RealAnswers as List<String> )?.AddRange( content );
+                        Console.WriteLine( "done." );
+                    }
+                }
+                catch ( Exception exception ) {
+                    exception.Report();
+                }
+            }
+
+            async Task LoadFromGithub() {
+                try {
+                    this.TempFile = Path.Combine( Path.GetTempPath(), nameof( FizzBuzzTeacher ) + ".txt" );
+
+                    if ( !File.Exists( this.TempFile ) ) {
+                        Console.WriteLine( "Loading GitHub file..." );
+                        var webclient = new WebClient();
+
+                        await webclient.DownloadFileTaskAsync(
+                                @"https://raw.githubusercontent.com/Protiguous/Experiments/master/FizzBuzz/1%20to%20100%20Expected%20Output.txt", this.TempFile )
+                            .ConfigureAwait( false );
+
+                        Console.WriteLine( "done." );
+                    }
+
+                    var content = await File.ReadAllLinesAsync( this.TempFile ).ConfigureAwait( false );
+
+                    this.RealAnswers.Clear();
+                    ( this.RealAnswers as List<String> )?.AddRange( content );
+                }
+                catch ( Exception exception ) {
+                    exception.Report();
+                    await Task.FromException( exception ).ConfigureAwait( false );
+                }
+            }
+        }
+
+        private String TempFile { get; set; }
+
+        protected virtual void Dispose( Boolean disposing ) {
+            if ( disposing ) { }
+
+            try {
+                if ( File.Exists( this.TempFile ) ) {
+                    File.Delete( this.TempFile );
+                }
+            }
+            catch ( Exception exception ) {
+                exception.Report();
             }
         }
 
