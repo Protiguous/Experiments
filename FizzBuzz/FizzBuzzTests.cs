@@ -37,51 +37,65 @@
 // Our GitHub address is "https://github.com/Protiguous".
 // Feel free to browse any source code we *might* make available.
 //
-// Project: "FizzBuzz", "FizzBuzzTests.cs" was last formatted by Protiguous on 2019/02/03 at 2:39 AM.
+// Project: "FizzBuzz", "FizzBuzzTests.cs" was last formatted by Protiguous on 2019/07/13 at 6:37 PM.
 
 namespace FizzBuzz {
 
     using System;
     using System.Diagnostics;
     using System.Threading.Tasks;
+    using BenchmarkDotNet.Attributes;
+    using BenchmarkDotNet.Mathematics;
     using JetBrains.Annotations;
     using NUnit.Framework;
 
     /// <summary>
     ///     <para>StackOverflow asked me if I've ever written the FizzBuzz challenge program.</para>
     ///     <para>I have not.. until now!</para>
-    ///     <para>My goal is to be performant, but not overly complicate.</para>
+    ///     <para>My goal is to be performant.. and over-code (complicate) it, hehe.</para>
     /// </summary>
     /// <rule>Write a program that prints the numbers from 1 to 100.</rule>
-    /// <rule>But for multiples of three print “Fizz” instead of the number, and for the multiples of five print “Buzz”.</rule>
-    /// <rule>For numbers which are multiples of both three and five print “FizzBuzz”.</rule>
+    /// <rule>1: For numbers which are multiples of both three and five print “FizzBuzz”.</rule>
+    /// <rule>2: Else for multiples of three print “Fizz”.</rule>
+    /// <rule>2: Else for the multiples of five print “Buzz”.</rule>
+    /// <rule>3: Else print the number.</rule>
+    [RankColumn( NumeralSystem.Arabic )]
+    [EvaluateOverhead( true )]
+    [ClrJob( baseline: true )]
     public class FizzBuzzTests {
 
         [NotNull]
         private IFizzBuzzGrader Teacher { get; } = new FizzBuzzTeacher();
 
         [OneTimeTearDown]
-        public void Done() {
-            using ( this.Teacher ) { }
-        }
+        public void Done() { }
 
         [OneTimeSetUp]
-        public Task Setup() => this.Teacher.LoadExpectedOutputs();
+        public Boolean Setup() => this.Teacher.LoadExpectedOutputs( "ExpectedOutput.1-100.txt" );
 
+        [Benchmark]
         [Test( TestOf = typeof( ClassicFizzBuzzTest ) )]
-        public async Task TestClassicFizzBuzz() {
+        public void TestClassicFizzBuzz() {
 
-            var testTimer = Stopwatch.StartNew();
+            var stopwatch = Stopwatch.StartNew();
 
             try {
+                Console.Write( "Create student " );
                 var student = new ClassicFizzBuzzTest( 1, 100 );
-                await student.TakeTest().ConfigureAwait( false );
-                this.Teacher.Grade( student );
+                Console.WriteLine( $"took {stopwatch.Elapsed.TotalMilliseconds} ms." );
+
+                Console.WriteLine( "Student taking test..." );
+                student.TakeTest();
+
+                this.Teacher.Grade( ref student );
             }
             finally {
-                testTimer.Stop();
-                Console.WriteLine( $"{nameof( ClassicFizzBuzzTest )} took {testTimer.Elapsed.TotalMilliseconds:N} ms." );
+                stopwatch.Stop();
+                Console.WriteLine( $"{nameof( ClassicFizzBuzzTest )} took {stopwatch.Elapsed.TotalMilliseconds:N} ms." );
             }
+
+            Console.WriteLine( "Press enter to quit." );
+            Console.ReadLine();
         }
     }
 }

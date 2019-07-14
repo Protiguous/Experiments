@@ -37,31 +37,29 @@
 // Our GitHub address is "https://github.com/Protiguous".
 // Feel free to browse any source code we *might* make available.
 //
-// Project: "FizzBuzz", "IFizzBuzzTest.cs" was last formatted by Protiguous on 2019/02/03 at 2:40 AM.
+// Project: "FizzBuzz", "IFizzBuzzTest.cs" was last formatted by Protiguous on 2019/07/13 at 6:37 PM.
 
 namespace FizzBuzz {
 
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
-    using System.Threading.Tasks;
     using JetBrains.Annotations;
 
     public interface IFizzBuzzTest {
 
         [NotNull]
-        ConcurrentDictionary<Int32, FooBar> Calculations { get; set; }
+        ConcurrentDictionary<Int32, FooBar> MyCalculations { get; set; }
 
         Int32 EndingNumber { get; }
 
         [NotNull]
-        List<String> MyAnswers { get; }
+        IReadOnlyList<String> MyAnswers { get; }
 
         Int32 NumbersToCount { get; }
 
         Int32 StartingNumber { get; }
 
-        [NotNull]
-        Task TakeTest();
+        void TakeTest();
     }
 }

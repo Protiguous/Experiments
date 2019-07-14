@@ -37,21 +37,20 @@
 // Our GitHub address is "https://github.com/Protiguous".
 // Feel free to browse any source code we *might* make available.
 //
-// Project: "FizzBuzz", "IFizzBuzzGrader.cs" was last formatted by Protiguous on 2019/02/03 at 2:40 AM.
+// Project: "FizzBuzz", "IFizzBuzzGrader.cs" was last formatted by Protiguous on 2019/07/13 at 6:37 PM.
 
 namespace FizzBuzz {
 
     using System;
     using System.Collections.Generic;
-    using System.Threading.Tasks;
     using JetBrains.Annotations;
 
-    public interface IFizzBuzzGrader : IDisposable {
+    public interface IFizzBuzzGrader {
 
         IList<String> RealAnswers { get; }
 
-        void Grade( [NotNull] IFizzBuzzTest test );
+        void Grade( [NotNull] ref ClassicFizzBuzzTest test );
 
-        Task LoadExpectedOutputs();
+        Boolean LoadExpectedOutputs( String fileName );
     }
 }

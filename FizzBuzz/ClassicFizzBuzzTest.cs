@@ -37,88 +37,99 @@
 // Our GitHub address is "https://github.com/Protiguous".
 // Feel free to browse any source code we *might* make available.
 //
-// Project: "FizzBuzz", "ClassicFizzBuzzTest.cs" was last formatted by Protiguous on 2019/02/03 at 2:39 AM.
+// Project: "FizzBuzz", "ClassicFizzBuzzTest.cs" was last formatted by Protiguous on 2019/07/13 at 6:36 PM.
 
 namespace FizzBuzz {
 
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Threading.Tasks;
+    using BenchmarkDotNet.Attributes;
+    using BenchmarkDotNet.Mathematics;
     using JetBrains.Annotations;
     using NUnit.Framework;
 
+    /// <summary>
+    /// </summary>
+    /// <rule>Write a program that prints the numbers from 1 to 100.</rule>
+    /// <rule>But for multiples of three print “Fizz” instead of the number, and for the multiples of five print “Buzz”.</rule>
+    /// <rule>For numbers which are multiples of both three and five print “FizzBuzz”.</rule>
+    [RankColumn( NumeralSystem.Arabic )]
+    [EvaluateOverhead( true )]
+    [ClrJob( baseline: true )]
     public class ClassicFizzBuzzTest : IFizzBuzzTest {
 
         [NotNull]
-        public ConcurrentDictionary<Int32, FooBar> Calculations { get; set; }
+        public ConcurrentDictionary<Int32, FooBar> MyCalculations { get; set; }
 
         public Int32 EndingNumber { get; }
 
-        public List<String> MyAnswers { get; } = new List<String>();
+        public IReadOnlyList<String> MyAnswers {
+            get {
+                if ( this._myAnswers == null ) {
+
+                    //this._myAnswers = this.Calculations.OrderBy( pair => pair.Key ).Select( pair => pair.Value.Answer ).ToList();
+                    return this._myAnswers = this.MyCalculations.Values.Select( pair => pair.Answer ).ToList();
+                }
+
+                return this._myAnswers;
+            }
+        }
 
         public Int32 NumbersToCount { get; }
 
         public Int32 StartingNumber { get; }
 
-        public async Task TakeTest() {
+        [Benchmark]
+        public void TakeTest() {
+
             try {
-                await DoCalculations().ConfigureAwait( false );
+                var stopwatch = Stopwatch.StartNew();
 
-                Assert.AreEqual( expected: this.StartingNumber, actual: this.Calculations.Min( pair => pair.Key ), message: $"Min != {nameof( this.StartingNumber )}" );
-                Assert.AreEqual( expected: this.EndingNumber, actual: this.Calculations.Max( pair => pair.Key ), message: $"Max != {nameof( this.EndingNumber )}" );
-                Assert.AreEqual( expected: this.NumbersToCount, actual: this.Calculations.Count, message: "Numbers to count mismatch" );
+                this.MyCalculations.Clear();
 
-                await CreateAnswers().ConfigureAwait( false );
+                Parallel.For( this.StartingNumber, this.EndingNumber + 1, FizzBuzzConstants.DontStarve, i => {
+                    var foo = new FooBar {
+                        Div3 = i.IsDiv3(), Div5 = i.IsDiv5()
+                    };
+
+                    if ( foo.Div3 && foo.Div5 ) {
+                        foo.Answer = FizzBuzzConstants.FizzBuzz;
+                    }
+                    else if ( foo.Div3 ) {
+                        foo.Answer = FizzBuzzConstants.Fizz;
+                    }
+                    else if ( foo.Div5 ) {
+                        foo.Answer = FizzBuzzConstants.Buzz;
+                    }
+                    else {
+                        foo.Answer = i.ToString();
+                    }
+
+                    this.MyCalculations[ i ] = foo;
+                } );
+
+                stopwatch.Stop();
+                Console.WriteLine( $"{nameof( this.TakeTest )} took {stopwatch.Elapsed.TotalMilliseconds} ms." );
             }
             catch ( Exception exception ) {
                 exception.Report();
             }
 
-            Task DoCalculations() {
-                return Task.Run( () => {
-                    try {
-                        this.Calculations.Clear();
-
-                        Parallel.For( this.StartingNumber, this.EndingNumber + 1, FizzBuzzConstants.DontStarve, i => this.Calculations.TryAdd( i, new FooBar {
-                            Div3 = i.IsDiv3(), Div5 = i.IsDiv5()
-                        } ) );
-                    }
-                    catch ( Exception exception ) {
-                        exception.Report();
-                    }
-                } );
-            }
-
-            Task CreateAnswers() {
-                return Task.Run( () => {
-                    lock ( this.MyAnswers ) {
-                        this.MyAnswers.Clear();
-
-                        foreach ( var number in this.Calculations ) {
-                            if ( number.Value.Div3 && number.Value.Div5 ) {
-                                this.MyAnswers.Add( FizzBuzzConstants.FizzBuzz );
-                            }
-                            else if ( number.Value.Div3 ) {
-                                this.MyAnswers.Add( FizzBuzzConstants.Fizz );
-                            }
-                            else if ( number.Value.Div5 ) {
-                                this.MyAnswers.Add( FizzBuzzConstants.Buzz );
-                            }
-                            else {
-                                this.MyAnswers.Add( number.Key.ToString() );
-                            }
-                        }
-                    }
-                } );
-            }
+            Assert.AreEqual( expected: this.StartingNumber, actual: this.MyCalculations.Min( pair => pair.Key ), message: $"Min != {nameof( this.StartingNumber )}" );
+            Assert.AreEqual( expected: this.EndingNumber, actual: this.MyCalculations.Max( pair => pair.Key ), message: $"Max != {nameof( this.EndingNumber )}" );
+            Assert.AreEqual( expected: this.NumbersToCount, actual: this.MyCalculations.Count, message: "Numbers to count mismatch" );
         }
+
+        private IReadOnlyList<String> _myAnswers;
 
         public ClassicFizzBuzzTest( Int32 startingNumber, Int32 endingNumber ) {
             this.StartingNumber = Math.Min( startingNumber, endingNumber );
             this.EndingNumber = Math.Max( startingNumber, endingNumber );
-            this.Calculations = new ConcurrentDictionary<Int32, FooBar>();
+            this.MyCalculations = new ConcurrentDictionary<Int32, FooBar>();
             this.NumbersToCount = this.EndingNumber + 1 - this.StartingNumber; //because Parallel.For is max-exclusive
         }
     }

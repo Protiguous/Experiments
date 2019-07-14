@@ -1,10 +1,10 @@
-// Copyright � Rick@AIBrain.org and Protiguous. All Rights Reserved.
+﻿// Copyright © Rick@AIBrain.org and Protiguous. All Rights Reserved.
 //
 // This entire copyright notice and license must be retained and must be kept visible
 // in any binaries, libraries, repositories, and source code (directly or derived) from
 // our binaries, libraries, projects, or solutions.
 //
-// This source code contained in "FooBar.cs" belongs to Protiguous@Protiguous.com and
+// This source code contained in "Program.cs" belongs to Protiguous@Protiguous.com and
 // Rick@AIBrain.org unless otherwise specified or the original license has
 // been overwritten by formatting.
 // (We try to avoid it from happening, but it does accidentally happen.)
@@ -37,18 +37,27 @@
 // Our GitHub address is "https://github.com/Protiguous".
 // Feel free to browse any source code we *might* make available.
 //
-// Project: "FizzBuzz", "FooBar.cs" was last formatted by Protiguous on 2019/07/13 at 6:37 PM.
+// Project: "FizzBuzz", "Program.cs" was last formatted by Protiguous on 2019/07/13 at 6:37 PM.
 
 namespace FizzBuzz {
 
     using System;
 
-    public class FooBar {
+    //using BenchmarkDotNet.Running;
 
-        public String Answer;
+    public class Program {
 
-        public Boolean Div3;
+        public static void Main( String[] args ) {
 
-        public Boolean Div5;
+            //foreach ( var report in BenchmarkRunner.Run<ClassicFizzBuzzTest>().Reports ) {Console.WriteLine( report.ResultStatistics );}
+            var test = new FizzBuzzTests();
+            test.Setup();
+            test.TestClassicFizzBuzz();
+            test.Done();
+
+            //Console.WriteLine();
+            //Console.WriteLine( "Press enter to exit..." );
+            //Console.ReadLine();
+        }
     }
 }
