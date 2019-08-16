@@ -18,7 +18,7 @@
 //
 // Donations are accepted (for now) via
 //     bitcoin:1Mad8TxTqxKnMiHuZxArFvX8BuFEB9nqX2
-//     paypal@AIBrain.Org
+//     PayPal:Protiguous@Protiguous.com
 //     (We're still looking into other solutions! Any ideas?)
 //
 // =========================================================
@@ -44,14 +44,24 @@ namespace BenchmarkingStuff {
     using System;
     using BenchmarkDotNet.Running;
 
-    public class ProgramFASTER {
+    public static class Program {
 
         public static void Main( String[] args ) {
-            var summary = BenchmarkRunner.Run<FASTERTests>();
+#if DEBUG
+            var bob = new DatabaseCalls();
+            bob.Setup();
+            Console.WriteLine( await bob.Scalar().ConfigureAwait(false) );
+            Console.WriteLine( await bob.Output().ConfigureAwait(false) );
+#else
+            //var summary = BenchmarkRunner.Run<UriVsFile>();
+            //var summary = BenchmarkRunner.Run<FASTERTests>();
+            //var summary = BenchmarkRunner.Run<ConcatTests>();
+            var summary = BenchmarkRunner.Run<DatabaseCalls>();
 
             foreach ( var report in summary.Reports ) {
                 Console.WriteLine( report.ResultStatistics );
             }
+#endif
 
             Console.WriteLine();
             Console.WriteLine( "Press enter to exit..." );

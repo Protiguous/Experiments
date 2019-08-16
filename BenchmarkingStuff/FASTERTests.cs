@@ -18,7 +18,7 @@
 //
 // Donations are accepted (for now) via
 //     bitcoin:1Mad8TxTqxKnMiHuZxArFvX8BuFEB9nqX2
-//     paypal@AIBrain.Org
+//     PayPal:Protiguous@Protiguous.com
 //     (We're still looking into other solutions! Any ideas?)
 //
 // =========================================================
@@ -57,7 +57,7 @@ namespace BenchmarkingStuff {
 
         private Byte[] data;
 
-        [Params( 1, 2 )]
+        [Params( 128, 256 )]
         public Int32 N;
 
         private MD5 MD5 { get; } = MD5.Create();

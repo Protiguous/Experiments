@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.329
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29201.188
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FizzBuzz", "FizzBuzz\FizzBuzz.csproj", "{68EEBD0B-4F67-4DAE-87F1-CDEEC89F8679}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkingStuff", "BenchmarkingStuff\BenchmarkingStuff.csproj", "{1ACC2BAC-9D6C-4F63-B2EA-11AD6F60C03B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Librainian", "..\Librainian\Librainian\Librainian.csproj", "{722E3411-B605-4AF8-ADEA-D2D18BC9CD2C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyAggNet", "MyAggNet\MyAggNet.csproj", "{30CB1E0E-15FC-4494-BC28-2FBEEC87B04A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -55,6 +57,18 @@ Global
 		{722E3411-B605-4AF8-ADEA-D2D18BC9CD2C}.Single Image|Any CPU.Build.0 = Single Image|Any CPU
 		{722E3411-B605-4AF8-ADEA-D2D18BC9CD2C}.Single Image|x64.ActiveCfg = Single Image|x64
 		{722E3411-B605-4AF8-ADEA-D2D18BC9CD2C}.Single Image|x64.Build.0 = Single Image|x64
+		{30CB1E0E-15FC-4494-BC28-2FBEEC87B04A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30CB1E0E-15FC-4494-BC28-2FBEEC87B04A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30CB1E0E-15FC-4494-BC28-2FBEEC87B04A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{30CB1E0E-15FC-4494-BC28-2FBEEC87B04A}.Debug|x64.Build.0 = Debug|Any CPU
+		{30CB1E0E-15FC-4494-BC28-2FBEEC87B04A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30CB1E0E-15FC-4494-BC28-2FBEEC87B04A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30CB1E0E-15FC-4494-BC28-2FBEEC87B04A}.Release|x64.ActiveCfg = Release|Any CPU
+		{30CB1E0E-15FC-4494-BC28-2FBEEC87B04A}.Release|x64.Build.0 = Release|Any CPU
+		{30CB1E0E-15FC-4494-BC28-2FBEEC87B04A}.Single Image|Any CPU.ActiveCfg = Release|Any CPU
+		{30CB1E0E-15FC-4494-BC28-2FBEEC87B04A}.Single Image|Any CPU.Build.0 = Release|Any CPU
+		{30CB1E0E-15FC-4494-BC28-2FBEEC87B04A}.Single Image|x64.ActiveCfg = Release|Any CPU
+		{30CB1E0E-15FC-4494-BC28-2FBEEC87B04A}.Single Image|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
