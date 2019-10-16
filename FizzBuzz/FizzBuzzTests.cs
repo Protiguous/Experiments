@@ -43,7 +43,6 @@ namespace FizzBuzz {
 
     using System;
     using System.Diagnostics;
-    using System.Threading.Tasks;
     using BenchmarkDotNet.Attributes;
     using BenchmarkDotNet.Mathematics;
     using JetBrains.Annotations;

@@ -42,30 +42,83 @@
 namespace BenchmarkingStuff {
 
     using System;
+    using System.Drawing;
+    using System.Windows.Forms;
     using BenchmarkDotNet.Running;
 
     public static class Program {
 
         public static void Main( String[] args ) {
-#if DEBUG
-            var bob = new DatabaseCalls();
-            bob.Setup();
-            Console.WriteLine( await bob.Scalar().ConfigureAwait(false) );
-            Console.WriteLine( await bob.Output().ConfigureAwait(false) );
-#else
+
+            /*
+            using ( var document = new Document( @"N:\Test\RSI.rar" ) ) {
+                var start = StartNew();
+                var task = document.CalculateHarkerHashDecimalAsync();
+                task.Start();
+                var hash = await document.CalculateHarkerHashDecimalAsync().ConfigureAwait( false );
+                start.Stop(); //hehe
+                Console.WriteLine( $"Took {start.Elapsed.Simpler()} to calculate {hash.ToString().DoubleQuote()}." );
+            }
+            */
+
             //var summary = BenchmarkRunner.Run<UriVsFile>();
             //var summary = BenchmarkRunner.Run<FASTERTests>();
             //var summary = BenchmarkRunner.Run<ConcatTests>();
-            var summary = BenchmarkRunner.Run<DatabaseCalls>();
+            //var summary = BenchmarkRunner.Run<DatabaseCalls>();
+            //var summary = BenchmarkRunner.Run<XorOrXor>();
+            //var summary = BenchmarkRunner.Run<FASTERConstructors>();
+            //var summary = BenchmarkRunner.Run<HashTests>();
+            var summary = BenchmarkRunner.Run<CapitalizeTests>();
 
             foreach ( var report in summary.Reports ) {
                 Console.WriteLine( report.ResultStatistics );
             }
-#endif
 
             Console.WriteLine();
             Console.WriteLine( "Press enter to exit..." );
             Console.ReadLine();
         }
+
+
+        public static void CreateMyForm() {
+            // Create a new instance of the form.
+            var form1 = new Form();
+            // Create two buttons to use as the accept and cancel buttons.
+            var button1 = new Button();
+            var button2 = new Button();
+
+            // Set the text of button1 to "OK".
+            button1.Text = "OK";
+            // Set the position of the button on the form.
+            button1.Location = new Point( 10, 10 );
+            // Set the text of button2 to "Cancel".
+            button2.Text = "Cancel";
+            // Set the position of the button based on the location of button1.
+            button2.Location
+                = new Point( button1.Left, button1.Height + button1.Top + 10 );
+            // Set the caption bar text of the form.   
+            form1.Text = "My Dialog Box";
+            // Display a help button on the form.
+            form1.HelpButton = true;
+
+            // Define the border style of the form to a dialog box.
+            form1.FormBorderStyle = FormBorderStyle.FixedDialog;
+            // Set the accept button of the form to button1.
+            form1.AcceptButton = button1;
+            // Set the cancel button of the form to button2.
+            form1.CancelButton = button2;
+            // Set the start position of the form to the center of the screen.
+            form1.StartPosition = FormStartPosition.CenterScreen;
+
+            // Add button1 to the form.
+            form1.Controls.Add( button1 );
+            // Add button2 to the form.
+            form1.Controls.Add( button2 );
+
+            // Display the form as a modal dialog box.
+            form1.ShowDialog();
+        }
     }
+
+
 }

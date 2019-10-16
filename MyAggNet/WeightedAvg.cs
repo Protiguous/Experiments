@@ -39,18 +39,68 @@
 //
 // Project: "MyAggNet", "WeightedAvg.cs" was last formatted by Protiguous on 2019/08/09 at 5:48 PM.
 
-using System;
-using System.Data.SqlTypes;
-using System.IO;
-using System.Runtime.CompilerServices;
-using System.Text;
-using JetBrains.Annotations;
-using Microsoft.SqlServer.Server;
-
 namespace MyAggNet {
+
+    using System;
+    using System.Data.SqlTypes;
+    using System.IO;
+    using System.Runtime.CompilerServices;
+    using System.Text;
+    using JetBrains.Annotations;
+    using Microsoft.SqlServer.Server;
 
     public class Functions {
 
+        [Serializable]
+        [SqlUserDefinedAggregate( Format.Native, IsInvariantToDuplicates = false, IsInvariantToNulls = true, IsInvariantToOrder = true, IsNullIfEmpty = true,
+            Name = "WeightedAvg" )]
+        public struct WeightedAvg {
+
+            /// <summary>
+            ///     The variable that holds the intermediate sum of all weights
+            /// </summary>
+            private Int32 count;
+
+            /// <summary>
+            ///     The variable that holds the intermediate sum of all values multiplied by their weight
+            /// </summary>
+            private Int64 sum;
+
+            /// <summary>
+            ///     Accumulate the next value, not if the value is null
+            /// </summary>
+            /// <param name="Value">Next value to be aggregated</param>
+            /// <param name="Weight">The weight of the value passed to Value parameter</param>
+            public void Accumulate( SqlInt32 Value, SqlInt32 Weight ) {
+                if ( !Value.IsNull && !Weight.IsNull ) {
+                    this.sum += ( Int64 )Value * ( Int64 )Weight;
+                    this.count += ( Int32 )Weight;
+                }
+            }
+
+            /// <summary>
+            ///     Initialize the internal data structures
+            /// </summary>
+            public void Init() {
+                this.sum = 0;
+                this.count = 0;
+            }
+
+            /// <summary>
+            ///     Merge the partially computed aggregate with this aggregate
+            /// </summary>
+            /// <param name="Group">The other partial results to be merged</param>
+            public void Merge( WeightedAvg Group ) {
+                this.sum += Group.sum;
+                this.count += Group.count;
+            }
+
+            /// <summary>
+            ///     Called at the end of aggregation, to return the results of the aggregation.
+            /// </summary>
+            /// <returns>The weighted average of all inputed values</returns>
+            public SqlInt32 Terminate() => this.count > 0 ? new SqlInt32( ( Int32 )( this.sum / this.count ) ) : SqlInt32.Null;
+        }
 
         [Serializable]
         [SqlUserDefinedAggregate( Format.UserDefined, //use clr serialization to serialize the intermediate result
@@ -58,7 +108,7 @@ namespace MyAggNet {
                 IsInvariantToDuplicates = false, //optimizer property
                 IsInvariantToOrder = false //optimizer property
                 , Name = nameof( Concatenate )
-                ,MaxByteSize = 8000 ) //maximum size in bytes of persisted value
+                , MaxByteSize = 8000 ) //maximum size in bytes of persisted value
         ]
         public class Concatenate : IBinarySerialize {
 
@@ -76,7 +126,7 @@ namespace MyAggNet {
                 if ( value.IsNull ) {
                     return;
                 }
-                
+
                 if ( this.intermediateResult.Length == 0 ) {
                     this.intermediateResult.Append( value.Value );
                 }
@@ -89,17 +139,13 @@ namespace MyAggNet {
             ///     Initialize the internal data structures
             /// </summary>
             [MethodImpl( MethodImplOptions.AggressiveInlining )]
-            public void Init() {
-                this.intermediateResult.Clear();
-            }
+            public void Init() => this.intermediateResult.Clear();
 
             /// <summary>
             ///     Merge the partially computed aggregate with this aggregate.
             /// </summary>
             /// <param name="other"></param>
-            public void Merge( Concatenate other ) {
-                this.intermediateResult.Append( other.intermediateResult );
-            }
+            public void Merge( Concatenate other ) => this.intermediateResult.Append( other.intermediateResult );
 
             public void Read( [CanBeNull] BinaryReader reader ) {
                 this.Init();
@@ -129,63 +175,6 @@ namespace MyAggNet {
             public void Write( [CanBeNull] BinaryWriter writer ) {
                 writer?.Write( this.intermediateResult.ToString() );
             }
-
         }
-
-
-        [Serializable]
-        [SqlUserDefinedAggregate( Format.Native, IsInvariantToDuplicates = false, IsInvariantToNulls = true, IsInvariantToOrder = true, IsNullIfEmpty = true,
-            Name = "WeightedAvg" )]
-        public struct WeightedAvg {
-
-            /// <summary>
-            ///     The variable that holds the intermediate sum of all weights
-            /// </summary>
-            private Int32 count;
-
-            /// <summary>
-            ///     The variable that holds the intermediate sum of all values multiplied by their weight
-            /// </summary>
-            private Int64 sum;
-
-            /// <summary>
-            ///     Accumulate the next value, not if the value is null
-            /// </summary>
-            /// <param name="Value">Next value to be aggregated</param>
-            /// <param name="Weight">The weight of the value passed to Value parameter</param>
-            public void Accumulate( SqlInt32 Value, SqlInt32 Weight ) {
-                if ( !Value.IsNull && !Weight.IsNull ) {
-                    this.sum += ( Int64 ) Value * ( Int64 ) Weight;
-                    this.count += ( Int32 ) Weight;
-                }
-            }
-
-            /// <summary>
-            ///     Initialize the internal data structures
-            /// </summary>
-            public void Init() {
-                this.sum = 0;
-                this.count = 0;
-            }
-
-            /// <summary>
-            ///     Merge the partially computed aggregate with this aggregate
-            /// </summary>
-            /// <param name="Group">The other partial results to be merged</param>
-            public void Merge( WeightedAvg Group ) {
-                this.sum += Group.sum;
-                this.count += Group.count;
-            }
-
-            /// <summary>
-            ///     Called at the end of aggregation, to return the results of the aggregation.
-            /// </summary>
-            /// <returns>The weighted average of all inputed values</returns>
-            public SqlInt32 Terminate() => this.count > 0 ? new SqlInt32( ( Int32 ) ( this.sum / this.count ) ) : SqlInt32.Null;
-
-        }
-
     }
-
 }
-
