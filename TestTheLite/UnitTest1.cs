@@ -37,7 +37,7 @@
 // Our GitHub address is "https://github.com/Protiguous".
 // Feel free to browse any source code we make available.
 // 
-// Project: "TestTheLite", "UnitTest1.cs" was last formatted by Protiguous on 2019/09/26 at 9:06 PM.
+// Project: "TestTheLite", "UnitTest1.cs" was last formatted by Protiguous on 2019/11/07 at 1:57 PM.
 
 namespace TestTheLite {
 
@@ -48,17 +48,6 @@ namespace TestTheLite {
     using Xunit;
 
     public class UnitTest1 {
-
-        public class LiteDatabase {
-
-            private SQLiteConnectionStringBuilder ConnectionStringBuilder;
-
-            public LiteDatabase( [CanBeNull] String connectionString = null ) {
-                connectionString = connectionString.Trim();
-                this.ConnectionStringBuilder = new SQLiteConnectionStringBuilder( connectionString );
-            }
-
-        }
 
         private static SQLiteConnection CreateConnection() {
 
@@ -114,24 +103,25 @@ namespace TestTheLite {
             conn.Close();
         }
 
-        [Fact]
-        public void Test1() {
-            using ( var sqlite_conn = CreateConnection() ) {
-                CreateTable( sqlite_conn );
-                InsertData( sqlite_conn );
-                ReadData( sqlite_conn );
+        public class LiteDatabase {
+
+            private SQLiteConnectionStringBuilder ConnectionStringBuilder;
+
+            public LiteDatabase( [CanBeNull] String connectionString = null ) {
+                connectionString = connectionString.Trim();
+                this.ConnectionStringBuilder = new SQLiteConnectionStringBuilder( connectionString );
             }
+
         }
 
-        
         public class TemperatureSensor {
 
             private Boolean _isInitialized;
 
-            public void Initialize() {
-                // Initialize hardware interface
-                this._isInitialized = true;
-            }
+            /// <summary>
+            ///     Initialize hardware interface
+            /// </summary>
+            public void Initialize() => this._isInitialized = true;
 
             public Int32 ReadCurrentTemperature() {
                 if ( !this._isInitialized ) {
@@ -141,17 +131,7 @@ namespace TestTheLite {
                 // Read hardware temp
                 return 42; // Simulate for demo code purposes
             }
-        }
 
-        [Fact]
-        public void ReadTemperature() {
-            var sut = new TemperatureSensor();
-
-            sut.Initialize();
-
-            var temperature = sut.ReadCurrentTemperature();
-
-            Assert.StrictEqual( 42, temperature );
         }
 
         [Fact]
@@ -168,11 +148,30 @@ namespace TestTheLite {
             var ex = Assert.Throws<InvalidOperationException>( () => sut.ReadCurrentTemperature() );
 
             Assert.Equal( "Cannot read temperature before initializing.", ex.Message );
+
             // or:
             //Assert.True( ex.Message, Is.EqualTo( "Cannot read temperature before initializing." ) );
         }
 
-        
+        [Fact]
+        public void ReadTemperature() {
+            var sut = new TemperatureSensor();
+
+            sut.Initialize();
+
+            var temperature = sut.ReadCurrentTemperature();
+
+            Assert.StrictEqual( 42, temperature );
+        }
+
+        [Fact]
+        public void Test1() {
+            using ( var sqlite_conn = CreateConnection() ) {
+                CreateTable( sqlite_conn );
+                InsertData( sqlite_conn );
+                ReadData( sqlite_conn );
+            }
+        }
 
     }
 

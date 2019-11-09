@@ -1,26 +1,26 @@
 // Copyright © Rick@AIBrain.org and Protiguous. All Rights Reserved.
-//
+// 
 // This entire copyright notice and license must be retained and must be kept visible
 // in any binaries, libraries, repositories, and source code (directly or derived) from
 // our binaries, libraries, projects, or solutions.
-//
+// 
 // This source code contained in "ClassicFizzBuzzTest.cs" belongs to Protiguous@Protiguous.com and
 // Rick@AIBrain.org unless otherwise specified or the original license has
 // been overwritten by formatting.
 // (We try to avoid it from happening, but it does accidentally happen.)
-//
+// 
 // Any unmodified portions of source code gleaned from other projects still retain their original
 // license and our thanks goes to those Authors. If you find your code in this source code, please
 // let us know so we can properly attribute you and include the proper license and/or copyright.
-//
+// 
 // If you want to use any of our code, you must contact Protiguous@Protiguous.com or
 // Sales@AIBrain.org for permission and a quote.
-//
+// 
 // Donations are accepted (for now) via
 //     bitcoin:1Mad8TxTqxKnMiHuZxArFvX8BuFEB9nqX2
 //     PayPal:Protiguous@Protiguous.com
-//     (We're still looking into other solutions! Any ideas?)
-//
+//     (We're always looking into other solutions.. Any ideas?)
+// 
 // =========================================================
 // Disclaimer:  Usage of the source code or binaries is AS-IS.
 //    No warranties are expressed, implied, or given.
@@ -28,16 +28,16 @@
 //    We are NOT responsible for Anything You Do With Our Executables.
 //    We are NOT responsible for Anything You Do With Your Computer.
 // =========================================================
-//
+// 
 // Contact us by email if you have any questions, helpful criticism, or if you would like to use our code in your project(s).
 // For business inquiries, please contact me at Protiguous@Protiguous.com
-//
+// 
 // Our website can be found at "https://Protiguous.com/"
 // Our software can be found at "https://Protiguous.Software/"
 // Our GitHub address is "https://github.com/Protiguous".
-// Feel free to browse any source code we *might* make available.
-//
-// Project: "FizzBuzz", "ClassicFizzBuzzTest.cs" was last formatted by Protiguous on 2019/07/13 at 6:36 PM.
+// Feel free to browse any source code we make available.
+// 
+// Project: "FizzBuzz", "ClassicFizzBuzzTest.cs" was last formatted by Protiguous on 2019/11/07 at 2:07 PM.
 
 namespace FizzBuzz {
 
@@ -50,7 +50,7 @@ namespace FizzBuzz {
     using BenchmarkDotNet.Attributes;
     using BenchmarkDotNet.Mathematics;
     using JetBrains.Annotations;
-    using NUnit.Framework;
+    using Xunit;
 
     /// <summary>
     /// </summary>
@@ -59,11 +59,8 @@ namespace FizzBuzz {
     /// <rule>For numbers which are multiples of both three and five print “FizzBuzz”.</rule>
     [RankColumn( NumeralSystem.Arabic )]
     [EvaluateOverhead( true )]
-    [ClrJob( baseline: true )]
+    [ClrJob]
     public class ClassicFizzBuzzTest : IFizzBuzzTest {
-
-        [NotNull]
-        public ConcurrentDictionary<Int32, FooBar> MyCalculations { get; set; }
 
         public Int32 EndingNumber { get; }
 
@@ -78,6 +75,9 @@ namespace FizzBuzz {
                 return this._myAnswers;
             }
         }
+
+        [NotNull]
+        public ConcurrentDictionary<Int32, FooBar> MyCalculations { get; set; }
 
         public Int32 NumbersToCount { get; }
 
@@ -119,9 +119,9 @@ namespace FizzBuzz {
                 exception.Report();
             }
 
-            Assert.AreEqual( expected: this.StartingNumber, actual: this.MyCalculations.Min( pair => pair.Key ), message: $"Min != {nameof( this.StartingNumber )}" );
-            Assert.AreEqual( expected: this.EndingNumber, actual: this.MyCalculations.Max( pair => pair.Key ), message: $"Max != {nameof( this.EndingNumber )}" );
-            Assert.AreEqual( expected: this.NumbersToCount, actual: this.MyCalculations.Count, message: "Numbers to count mismatch" );
+            Assert.StrictEqual( expected: this.StartingNumber, actual: this.MyCalculations.Min( pair => pair.Key ) );
+            Assert.StrictEqual( expected: this.EndingNumber, actual: this.MyCalculations.Max( pair => pair.Key ) );
+            Assert.StrictEqual( expected: this.NumbersToCount, actual: this.MyCalculations.Count );
         }
 
         private IReadOnlyList<String> _myAnswers;
@@ -132,5 +132,7 @@ namespace FizzBuzz {
             this.MyCalculations = new ConcurrentDictionary<Int32, FooBar>();
             this.NumbersToCount = this.EndingNumber + 1 - this.StartingNumber; //because Parallel.For is max-exclusive
         }
+
     }
+
 }

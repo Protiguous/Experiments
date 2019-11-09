@@ -1,26 +1,26 @@
 ﻿// Copyright © Rick@AIBrain.org and Protiguous. All Rights Reserved.
-//
+// 
 // This entire copyright notice and license must be retained and must be kept visible
 // in any binaries, libraries, repositories, and source code (directly or derived) from
 // our binaries, libraries, projects, or solutions.
-//
+// 
 // This source code contained in "WeightedAvg.cs" belongs to Protiguous@Protiguous.com and
 // Rick@AIBrain.org unless otherwise specified or the original license has
 // been overwritten by formatting.
 // (We try to avoid it from happening, but it does accidentally happen.)
-//
+// 
 // Any unmodified portions of source code gleaned from other projects still retain their original
 // license and our thanks goes to those Authors. If you find your code in this source code, please
 // let us know so we can properly attribute you and include the proper license and/or copyright.
-//
+// 
 // If you want to use any of our code, you must contact Protiguous@Protiguous.com or
 // Sales@AIBrain.org for permission and a quote.
-//
+// 
 // Donations are accepted (for now) via
 //     bitcoin:1Mad8TxTqxKnMiHuZxArFvX8BuFEB9nqX2
 //     PayPal:Protiguous@Protiguous.com
 //     (We're always looking into other solutions.. Any ideas?)
-//
+// 
 // =========================================================
 // Disclaimer:  Usage of the source code or binaries is AS-IS.
 //    No warranties are expressed, implied, or given.
@@ -28,16 +28,16 @@
 //    We are NOT responsible for Anything You Do With Our Executables.
 //    We are NOT responsible for Anything You Do With Your Computer.
 // =========================================================
-//
+// 
 // Contact us by email if you have any questions, helpful criticism, or if you would like to use our code in your project(s).
 // For business inquiries, please contact me at Protiguous@Protiguous.com
-//
+// 
 // Our website can be found at "https://Protiguous.com/"
 // Our software can be found at "https://Protiguous.Software/"
 // Our GitHub address is "https://github.com/Protiguous".
 // Feel free to browse any source code we make available.
-//
-// Project: "MyAggNet", "WeightedAvg.cs" was last formatted by Protiguous on 2019/08/09 at 5:48 PM.
+// 
+// Project: "MyAggNet", "WeightedAvg.cs" was last formatted by Protiguous on 2019/11/07 at 1:57 PM.
 
 namespace MyAggNet {
 
@@ -73,8 +73,8 @@ namespace MyAggNet {
             /// <param name="Weight">The weight of the value passed to Value parameter</param>
             public void Accumulate( SqlInt32 Value, SqlInt32 Weight ) {
                 if ( !Value.IsNull && !Weight.IsNull ) {
-                    this.sum += ( Int64 )Value * ( Int64 )Weight;
-                    this.count += ( Int32 )Weight;
+                    this.sum += ( Int64 ) Value * ( Int64 ) Weight;
+                    this.count += ( Int32 ) Weight;
                 }
             }
 
@@ -99,7 +99,8 @@ namespace MyAggNet {
             ///     Called at the end of aggregation, to return the results of the aggregation.
             /// </summary>
             /// <returns>The weighted average of all inputed values</returns>
-            public SqlInt32 Terminate() => this.count > 0 ? new SqlInt32( ( Int32 )( this.sum / this.count ) ) : SqlInt32.Null;
+            public SqlInt32 Terminate() => this.count > 0 ? new SqlInt32( ( Int32 ) ( this.sum / this.count ) ) : SqlInt32.Null;
+
         }
 
         [Serializable]
@@ -107,10 +108,21 @@ namespace MyAggNet {
                 IsInvariantToNulls = true, //optimizer property
                 IsInvariantToDuplicates = false, //optimizer property
                 IsInvariantToOrder = false //optimizer property
-                , Name = nameof( Concatenate )
-                , MaxByteSize = 8000 ) //maximum size in bytes of persisted value
+                , Name = nameof( Concatenate ), MaxByteSize = 8000 ) //maximum size in bytes of persisted value
         ]
         public class Concatenate : IBinarySerialize {
+
+            public void Read( [CanBeNull] BinaryReader reader ) {
+                this.Init();
+
+                if ( reader == null ) {
+                    return;
+                }
+
+                this.intermediateResult.Append( reader.ReadString() );
+            }
+
+            public void Write( [CanBeNull] BinaryWriter writer ) => writer?.Write( this.intermediateResult.ToString() );
 
             /// <summary>
             ///     The variable that holds the intermediate result of the concatenation
@@ -147,16 +159,6 @@ namespace MyAggNet {
             /// <param name="other"></param>
             public void Merge( Concatenate other ) => this.intermediateResult.Append( other.intermediateResult );
 
-            public void Read( [CanBeNull] BinaryReader reader ) {
-                this.Init();
-
-                if ( reader == null ) {
-                    return;
-                }
-
-                this.intermediateResult.Append( reader.ReadString() );
-            }
-
             /// <summary>
             ///     Called at the end of aggregation, to return the results of the aggregation.
             /// </summary>
@@ -172,9 +174,8 @@ namespace MyAggNet {
                 return new SqlString( output );
             }
 
-            public void Write( [CanBeNull] BinaryWriter writer ) {
-                writer?.Write( this.intermediateResult.ToString() );
-            }
         }
+
     }
+
 }

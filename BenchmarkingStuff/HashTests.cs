@@ -45,39 +45,49 @@ namespace BenchmarkingStuff {
     using System.Threading.Tasks;
     using BenchmarkDotNet.Attributes;
     using BenchmarkDotNet.Mathematics;
+    using JetBrains.Annotations;
+    using Librainian.Extensions;
     using Librainian.OperatingSystem.FileSystem;
     using Xunit;
+    using Xunit.Abstractions;
 
     [RankColumn( NumeralSystem.Arabic )]
     [EvaluateOverhead]
-    [ClrJob( baseline: true )]
-    public class HashTests : IClassFixture<TestsFixture> {
+    [SimpleJob( baseline: true )]
+    public class HashTests  {
+
+        [NotNull]
+        private readonly ITestOutputHelper _testOutputHelper;
 
         [Params( 1 )]
         public Int32 N;
 
+        public HashTests( [NotNull] ITestOutputHelper testOutputHelper ) {
+            this._testOutputHelper = testOutputHelper ?? throw new ArgumentNullException( nameof( testOutputHelper ) );
+        }
+
+        [Fact]
         [Benchmark]
         public async Task HarkerHashInt64Async() {
 
             using ( var document = new Document( @"N:\Test\RSI.rar" ) ) {
                 var hash = await document.CalculateHarkerHashInt64Async().ConfigureAwait(false);
-                Console.WriteLine( hash );
+                this._testOutputHelper.WriteLine( hash.ToString() );
             }
         }
 
-        /*
         [Benchmark]
         public void ByNewbie( ) {
-            var data = Types.Newbie<MyClass>();
+            var data = Types.Newby<FASTERConstructors.MyClass>();
             data.Name = this.N.ToString();
 
             if ( data.Name != this.N.ToString() ) {
-                throw new NullReferenceException( $"{nameof( Types.Newbie )} failed." );
+                throw new NullReferenceException( $"{nameof( Types.Newby )} failed." );
 
                 //return false;
             }
         }
-        */
+
 
         /*
         [GlobalSetup]

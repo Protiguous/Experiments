@@ -62,7 +62,7 @@ namespace BenchmarkingStuff {
             };
 
             if ( data.Name != this.N.ToString() ) {
-                throw new NullReferenceException( $"{nameof( Types.Newbie )} failed." );
+                throw new NullReferenceException( $"{nameof( Types.Newby )} failed." );
 
                 //return false;
             }
@@ -70,11 +70,11 @@ namespace BenchmarkingStuff {
 
         [Benchmark]
         public void ByNewbie( ) {
-            var data = Types.Newbie<MyClass>();
+            var data = Types.Newby<MyClass>();
             data.Name = this.N.ToString();
 
             if ( data.Name != this.N.ToString() ) {
-                throw new NullReferenceException( $"{nameof( Types.Newbie )} failed." );
+                throw new NullReferenceException( $"{nameof( Types.Newby )} failed." );
 
                 //return false;
             }
